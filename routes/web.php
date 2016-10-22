@@ -16,7 +16,8 @@ $app->get('/', function () use ($app) {
 });
 
 $app->post('/create', 'UserController@create');
-$app->post('/user/auth', ['middleware' => 'auth', 'uses' => 'UserController@auth']);
+$app->post('/user/auth', 'UserController@auth');
+$app->post('/check-token', 'UserController@checkToken');
 
 /*$app->group(['middleware' => 'auth'], function () use ($app) {
 
