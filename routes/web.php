@@ -12,13 +12,16 @@
 */
 
 $app->get('/', function () use ($app) {
-    return $app->version();
+    return view("index");
+});
+$app->get('/register', function () use ($app) {
+   return view("register");
+});
+$app->get('/download', function () use ($app) {
+    return view("download");
 });
 
 $app->post('/create', 'UserController@create');
 $app->post('/user/auth', 'UserController@auth');
 $app->post('/check-token', 'UserController@checkToken');
 
-/*$app->group(['middleware' => 'auth'], function () use ($app) {
-
-});*/

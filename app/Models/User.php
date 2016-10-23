@@ -1,6 +1,6 @@
 <?php
 
-namespace App;
+namespace App\Models;
 
 use Illuminate\Auth\Authenticatable;
 use Laravel\Lumen\Auth\Authorizable;
@@ -29,4 +29,13 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
     protected $hidden = [
         'password','token',
     ];
+
+    public function plays() {
+        $this->hasMany('App\Models\Game');
+    }
+
+    public function pictures() {
+        $this->hasMany('App\Models\Picture');
+    }
+
 }

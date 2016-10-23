@@ -9,21 +9,27 @@
 namespace App\Http\Controllers;
 
 
-use App\User;
+use App\Models\User;
+use App\Utils\Auth;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 
 class UserController extends Controller
 {
     public function create(Request $request) {
+        //TODO: check if user already exist
+
+        if ($usertest = User::where(['email' => $request->input('email')])->first()) {
+            return response()->json(['error' => 'User already exist'], 406);
+        }
+
         $request->merge(['password' => Hash::make($request->get('password'))]);
-        $request->merge(['token' => $this->generateToken($request->get('email'), $request->get('password'))]);
+        $request->merge(['token' => Auth::generateKey($request->get('email'), $request->get('password'))]);
 
         if ($user = User::create($request->all())) {
-            return response('201', 201);
+            return response()->json(['email' => $user->email, 'name' => $user->name], 201);
         } else {
-            return response('400', 400);
+            return response()->json(['error' => 'Malformed request'], 400);
         }
     }
 
@@ -31,8 +37,8 @@ class UserController extends Controller
         if ($request->input('email') && $request->input('password')) {
             if ($user = User::where(['email' => $request->input('email')])->first()) {
                 if (Hash::check($request->input('password'), $user->password)) {
-                    $token = $user->token;
-                    return response()->json(['email' => $request->get('email'), 'token' => $token]);
+                    $token = Auth::generateToken($user->email, $user->token);
+                    return response()->json(['email' => $user->email, 'token' => $token]);
                 }
             }
         }
@@ -41,18 +47,17 @@ class UserController extends Controller
 
     public function checkToken(Request $request) {
         if ($request->input('token')) {
-            if ($user = User::where('token', $request->input('token'))->first()) {
+            $user = Auth::checkToken($request->input('token'));
+            if ($user === Auth::TOKEN_INVALID) {
+                return response()->json(['error' => 'Token not valid!'], 403);
+            } else if ($user === Auth::TOKEN_NOT_EXIST) {
+                return response()->json(['error' => 'Token does not exist!'], 403);
+            } else if ($user) {
                 return response()->json(['name' => $user->name, 'email' => $user->email]);
             } else {
-                return response()->json(['error' => 'Token not valid!'], 403);
+                return response()->json(['error' => 'Something weird happened...'], 500);
             }
         }
         return response()->json(['error' => 'No token sent'], 400);
-    }
-
-    private function generateToken($email, $password) {
-        $time = date_create()->getTimestamp();
-        $payload = ['email' => $email, 'timestamp' => $time, 'key' => hash('sha512', $email.$password.$time)];
-        return base64_encode(json_encode($payload));
     }
 }
