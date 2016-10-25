@@ -21,7 +21,8 @@ $app->get('/download', function () use ($app) {
     return view("download");
 });
 
-$app->post('/create', 'UserController@create');
+$app->post('/user/create', 'UserController@create');
 $app->post('/user/auth', 'UserController@auth');
 $app->post('/check-token', 'UserController@checkToken');
 
+$app->post('/game/create', 'GameController@create');

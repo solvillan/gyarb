@@ -29,11 +29,11 @@ class Picture extends Model
     ];
 
     public function owner() {
-        $this->belongsTo('App\Models\User');
+        return $this->belongsTo('App\Models\User');
     }
 
     public function game() {
-        $this->belongsTo('App\Models\Game');
+        return $this->belongsTo('App\Models\Game');
     }
 
 }

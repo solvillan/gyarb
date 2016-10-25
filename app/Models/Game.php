@@ -27,11 +27,11 @@ class Game extends Model
     ];
 
     public function players() {
-        $this->belongsToMany('App\Models\User');
+        return $this->belongsToMany('App\Models\User');
     }
 
     public function pictures() {
-        $this->hasMany('App\Models\Picture');
+        return $this->hasMany('App\Models\Picture');
     }
 
 }

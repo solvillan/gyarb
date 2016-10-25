@@ -31,11 +31,11 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
     ];
 
     public function plays() {
-        $this->hasMany('App\Models\Game');
+        return $this->hasMany('App\Models\Game');
     }
 
     public function pictures() {
-        $this->hasMany('App\Models\Picture');
+        return $this->hasMany('App\Models\Picture');
     }
 
 }
