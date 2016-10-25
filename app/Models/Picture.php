@@ -14,7 +14,7 @@ use Illuminate\Database\Eloquent\Model;
 class Picture extends Model
 {
     protected $fillable = [
-        'data', 'time', 'word',
+        'data', 'time', 'word', 'user_id', 'game_id',
     ];
 
 
@@ -29,7 +29,7 @@ class Picture extends Model
     ];
 
     public function owner() {
-        return $this->belongsTo('App\Models\User');
+        return $this->belongsTo('App\Models\User', 'user_id');
     }
 
     public function game() {

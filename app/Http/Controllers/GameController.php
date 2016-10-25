@@ -11,6 +11,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Game;
 use App\Models\Picture;
+use App\Models\User;
 use App\Utils\Auth;
 use Illuminate\Http\Request;
 
@@ -20,18 +21,20 @@ class GameController extends Controller
         if ($request->input('token')) {
             $user = Auth::checkToken($request->input('token'));
             if ($user !== Auth::TOKEN_INVALID && $user !== Auth::TOKEN_NOT_EXIST) {
-                $game = new Game();
-                //$game->players->save($user);
-                $picture = new Picture(['data' => 'The Data', 'owner' => $user->id, 'word' => 'Hello, world!']);
-                $picture->save();
-                $game->pictures->save($picture);
+                $user = Auth::checkToken($request->input('token'));
+                $game = Game::create();
                 $game->save();
-                $user->pictures->save($picture);
-                $user->plays->save($game);
-                return response(201);
+                $game->players()->attach($user);
+                $picture = new Picture(['data' => 'The Data', 'word' => 'Hello world!']);
+                $picture->game()->associate($game);
+                $picture->owner()->associate($user);
+                $picture->save();
+                $user->save();
+                $game->save();
+                return response()->json(['user' => $user, 'game' => $game, 'picture' => $picture], 201);
             }
-            return response(403);
+            return response('Forbidden', 403);
         }
-        return response(400);
+        return response('Malformed request', 400);
     }
 }

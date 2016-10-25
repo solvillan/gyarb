@@ -17,8 +17,10 @@ class Picture extends Migration
             $table->increments('id');
             $table->string('word');
             $table->text('data');
-            $table->integer('user_id')->unsigned();
-            $table->foreign('user_id')->references('id')->on('users');
+            $table->integer('user_id')->unsigned()->index();
+            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
+            $table->integer('game_id')->unsigned()->index();
+            $table->foreign('game_id')->references('id')->on('games')->onDelete('cascade');
             $table->timestamp('time');
             $table->timestamps();
         });
