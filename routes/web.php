@@ -26,3 +26,4 @@ $app->post('/user/auth', 'UserController@auth');
 $app->post('/check-token', 'UserController@checkToken');
 
 $app->post('/game/create', 'GameController@create');
+$app->post('/game/{id}/players/add', 'GameController@addPlayer');

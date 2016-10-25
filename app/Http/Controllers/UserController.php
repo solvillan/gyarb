@@ -27,7 +27,7 @@ class UserController extends Controller
         $request->merge(['token' => Auth::generateKey($request->get('email'), $request->get('password'))]);
 
         if ($user = User::create($request->all())) {
-            return response()->json(['email' => $user->email, 'name' => $user->name], 201);
+            return response()->json(['id' => $user->id, 'email' => $user->email, 'name' => $user->name], 201);
         } else {
             return response()->json(['error' => 'Malformed request'], 400);
         }
@@ -38,7 +38,7 @@ class UserController extends Controller
             if ($user = User::where(['email' => $request->input('email')])->first()) {
                 if (Hash::check($request->input('password'), $user->password)) {
                     $token = Auth::generateToken($user->email, $user->token);
-                    return response()->json(['email' => $user->email, 'token' => $token]);
+                    return response()->json(['id' => $user->id,'email' => $user->email, 'token' => $token]);
                 }
             }
         }
