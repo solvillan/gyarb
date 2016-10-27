@@ -13,16 +13,24 @@ use App\Models\Game;
 use App\Models\Picture;
 use App\Models\User;
 use App\Utils\Auth;
+use App\Utils\Wordlist;
 use Illuminate\Http\Request;
 
 class GameController extends Controller
 {
+    /**
+     * Create a new Game
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse|\Illuminate\Http\Response|\Laravel\Lumen\Http\ResponseFactory
+     */
     public function create(Request $request) {
         if ($request->input('token')) {
             $user = Auth::checkToken($request->input('token'));
             if ($user !== Auth::TOKEN_INVALID && $user !== Auth::TOKEN_NOT_EXIST) {
                 $user = Auth::checkToken($request->input('token'));
-                $game = Game::create();
+                $game = new Game();
+                $game->status = 0;
+                $game->owner()->associate($user);
                 $game->save();
                 $game->players()->attach($user);
                 $user->save();
@@ -34,13 +42,18 @@ class GameController extends Controller
         return response('Malformed request', 400);
     }
 
+    /**
+     * Add a player to a game
+     * @param Request $request
+     * @param $gid int Game ID
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function addPlayer(Request $request, $gid) {
         if ($request->input('token') && $request->input('player_id')) {
             $user = Auth::checkToken($request->input('token'));
-            $payload = json_decode(base64_decode($request->input('token')));
             if ($user !== Auth::TOKEN_INVALID && $user !== Auth::TOKEN_NOT_EXIST) {
                 $game = Game::find($gid);
-                if ($this->checkUser($request->input('token'), $game->players)) {
+                if (Auth::userMemberOf($request->input('token'), $game->players)) {
                     $player = User::find($request->input('player_id'));
                     $game->players()->attach($player);
                     $game->save();
@@ -56,16 +69,35 @@ class GameController extends Controller
         }
     }
 
-    private function checkUser($token, $list) {
-        $payload = json_decode(base64_decode($token));
-        $auth = false;
-        foreach ($list as $player) {
-            if ($player->token === $payload->key) {
-                $auth = true;
-                break;
+    public function start(Request $request, $gid) {
+        /*
+         *  - Set active
+         *  - Random gen first user and word
+         *  - Send word to first user
+         *      - Set first user id and current_word.
+         */
+        if ($request->input('token') && $request->input('player_id')) {
+            $user = Auth::checkToken($request->input('token'));
+            if ($user !== Auth::TOKEN_INVALID && $user !== Auth::TOKEN_NOT_EXIST) {
+                $game = Game::find($gid);
+                if ($game->owner->id == $user->id) {
+                    $game->current_word = Wordlist::getWord();
+                    $first_player = $game->players()->shuffle()->first();
+                    $first_player->currentDraws()->associate($game);
+                    // Activate
+                    $game->status = 1;
+                    $game->save();
+                    $first_player->save();
+                    return response()->json(['game' => $game, 'added_by' => $user]);
+                } else {
+                    return response()->json(['error' => 'Not authorized to add players'], 401);
+                }
+            } else {
+                return response()->json(['error' => 'Not authorized'], 401);
             }
+        } else {
+            return response()->json(['error' => 'Malformed request'], 400);
         }
-        return $auth;
     }
 
 }

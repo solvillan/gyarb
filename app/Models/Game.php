@@ -14,7 +14,7 @@ use Illuminate\Database\Eloquent\Model;
 class Game extends Model
 {
     protected $fillable = [
-
+        'active'
     ];
 
     /**
@@ -26,12 +26,33 @@ class Game extends Model
 
     ];
 
+    /**
+     * Users that play this Game
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
+     */
     public function players() {
         return $this->belongsToMany('App\Models\User');
     }
 
+    /**
+     * Pictures belonging to this Game
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
     public function pictures() {
         return $this->hasMany('App\Models\Picture');
+    }
+
+    /**
+     * The User that own the Game
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function owner() {
+        return $this->belongsTo('App\Models\User');
+    }
+
+    public function currentPlayer()
+    {
+        return $this->hasOne('App\Models\User', 'current_player', 'game_id');
     }
 
 }

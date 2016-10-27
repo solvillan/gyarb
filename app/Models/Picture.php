@@ -28,10 +28,18 @@ class Picture extends Model
 
     ];
 
+    /**
+     * The User that own the Picture
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
     public function owner() {
         return $this->belongsTo('App\Models\User', 'user_id');
     }
 
+    /**
+     * The Game that the Picture belong to
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
     public function game() {
         return $this->belongsTo('App\Models\Game');
     }
