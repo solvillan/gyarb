@@ -43,6 +43,7 @@ $app->get('/user/{token}/list/friends', 'UserController@listFriends');
  */
 $app->post('/game/create', 'GameController@create');
 $app->post('/game/{id}/players/add', 'GameController@addPlayer');
+$app->post('/game/{id}/start', 'GameController@start');
 
 /*
  * Game related GET

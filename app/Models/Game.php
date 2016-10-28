@@ -52,7 +52,7 @@ class Game extends Model
 
     public function currentPlayer()
     {
-        return $this->hasOne('App\Models\User', 'current_player', 'game_id');
+        return $this->belongsTo('App\Models\User', 'current_player');
     }
 
 }

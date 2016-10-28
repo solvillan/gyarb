@@ -16,6 +16,7 @@ class Game extends Migration
         Schema::create('games', function (Blueprint $table) {
             $table->increments('id');
             $table->string('current_word');
+            $table->smallInteger('status');
             $table->integer('owner_id')->unsigned();
             $table->foreign('owner_id')->references('id')->on('users')->onDelete('cascade');
             $table->integer('current_player')->unsigned();

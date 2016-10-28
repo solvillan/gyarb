@@ -72,7 +72,7 @@ class User extends Model //implements AuthenticatableContract, AuthorizableContr
 
     public function currentDraws()
     {
-        return $this->belongsToMany('App\Models\Game', 'game_id', 'current_user');
+        return $this->hasMany('App\Models\Game', 'current_player', 'id');
     }
 
 }
