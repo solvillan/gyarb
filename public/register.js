@@ -7,9 +7,10 @@ function register() {
     var form = new FormData(formElem);
 
     var request = new XMLHttpRequest();
-    request.open("post", "/create", true);
+    request.open("post", "/user/create", true);
     request.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
     request.onreadystatechange = function () {
+        console.log("Readystate changed: " + request.readyState + " - Status: " + request.status);
         if (request.readyState == XMLHttpRequest.DONE) {
             if (request.status == 201) {
                 //location.href = "/download";
@@ -23,4 +24,5 @@ function register() {
     };
     console.log(JSON.stringify(form.values()));
     request.send(formElem);
+    console.log("Sent reg request!");
 }

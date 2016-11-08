@@ -69,12 +69,23 @@ class GameController extends Controller
         }
     }
 
+    /**
+     * Start the game
+     * @param Request $request
+     * @param $gid
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function start(Request $request, $gid) {
         if ($request->input('token')) {
             $user = Auth::checkToken($request->input('token'));
             if ($user !== Auth::TOKEN_INVALID && $user !== Auth::TOKEN_NOT_EXIST) {
                 $game = Game::find($gid);
                 if ($game->owner->id == $user->id) {
+
+                    if ($game->status !== 0) {
+                        return response()->json(['error' => 'Game already active!'], 403);
+                    }
+
                     //Random gen first word
                     $game->current_word = Wordlist::getWord();
 
