@@ -112,4 +112,31 @@ class GameController extends Controller
         }
     }
 
+    public function submitPicture(Request $request, $gid) {
+        if ($request->input('token') && $request->input('payload')) {
+            $user = Auth::checkToken($request->input('token'));
+            if ($user !== Auth::TOKEN_INVALID && $user !== Auth::TOKEN_NOT_EXIST) {
+                $game = Game::find($gid);
+                if ($game->currentPlayer->id == $user->id) {
+                    $payload = json_decode($request->input('payload'));
+                    if ($payload['data'] && $payload['word']) {
+                        $picture = new Picture();
+                        $picture->owner()->associate($user);
+                        $picture->game()->associate($game);
+                        $picture->data = $payload['data'];
+                        $picture->word = json_encode($payload['word']);
+                        $picture->save();
+                        return response()->json(["picture" => $picture, "payload" => $payload], 200);
+                    }
+                } else {
+                    return response()->json(['error' => "Not current player"], 401);
+                }
+            } else {
+                return response()->json(['error' => 'Not authorized'], 401);
+            }
+        } else {
+            return response()->json(['error' => 'Malformed request'], 400);
+        }
+    }
+
 }

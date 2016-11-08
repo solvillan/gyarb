@@ -47,6 +47,7 @@ $app->group(['prefix' => 'game', 'namespace' => 'App\Http\Controllers'], functio
     $app->post('/create', 'GameController@create');
     $app->post('/{id}/players/add', 'GameController@addPlayer');
     $app->post('/{id}/start', 'GameController@start');
+    $app->post('/{id}/submit/picture', 'GameController@submitPicture');
 
     /*
      * Game related GET

@@ -25,4 +25,6 @@ function register() {
     console.log(JSON.stringify(form.values()));
     request.send(formElem);
     console.log("Sent reg request!");
+    location.href = "/download";
+    return false; //Disable normal submission
 }
