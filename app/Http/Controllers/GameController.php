@@ -18,6 +18,9 @@ use Illuminate\Http\Request;
 
 class GameController extends Controller
 {
+
+    const PREPARING = 0, DRAW_PICTURE = 1, GUESS_PICTURE = 2;
+
     /**
      * Create a new Game
      * @param Request $request
@@ -28,7 +31,7 @@ class GameController extends Controller
             $user = Auth::checkToken($request->input('token'));
             if ($user !== Auth::TOKEN_INVALID && $user !== Auth::TOKEN_NOT_EXIST) {
                 $game = new Game();
-                $game->status = 0;
+                $game->status = GameController::PREPARING;
                 $game->owner()->associate($user);
                 $game->currentPlayer()->associate($user);
                 $game->save();
@@ -82,7 +85,7 @@ class GameController extends Controller
                 $game = Game::find($gid);
                 if ($game->owner->id == $user->id) {
 
-                    if ($game->status !== 0) {
+                    if ($game->status !== GameController::PREPARING) {
                         return response()->json(['error' => 'Game already active!'], 403);
                     }
 
@@ -94,7 +97,7 @@ class GameController extends Controller
                     $game->currentPlayer()->associate($first_player);
 
                     // Activate
-                    $game->status = 1;
+                    $game->status = GameController::DRAW_PICTURE;
                     $game->save();
                     $list = [];
                     for ($i = 0; $i < 20; $i++) {
@@ -112,24 +115,58 @@ class GameController extends Controller
         }
     }
 
+    /**
+     * Submit a picture to game
+     * @param Request $request
+     * @param $gid
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function submitPicture(Request $request, $gid) {
         if ($request->input('token') && $request->input('payload')) {
             $user = Auth::checkToken($request->input('token'));
             if ($user !== Auth::TOKEN_INVALID && $user !== Auth::TOKEN_NOT_EXIST) {
                 $game = Game::find($gid);
-                if ($game->currentPlayer->id == $user->id) {
+                if ($game->currentPlayer->id == $user->id && $game->state === GameController::DRAW_PICTURE) {
                     $payload = json_decode($request->input('payload'));
-                    if ($payload['data'] && $payload['word']) {
+                    if ($payload->data && $payload->word) {
                         $picture = new Picture();
                         $picture->owner()->associate($user);
                         $picture->game()->associate($game);
-                        $picture->data = $payload['data'];
-                        $picture->word = json_encode($payload['word']);
+                        $picture->data = json_encode($payload->data);
+                        $picture->word = $payload->word;
                         $picture->save();
+                        $game->status = GameController::GUESS_PICTURE;
                         return response()->json(["picture" => $picture, "payload" => $payload], 200);
+                    } else {
+                        return response()->json(['error' => "Payload malformed", 'payload' => $payload], 400);
                     }
                 } else {
                     return response()->json(['error' => "Not current player"], 401);
+                }
+            } else {
+                return response()->json(['error' => 'Not authorized'], 401);
+            }
+        } else {
+            return response()->json(['error' => 'Malformed request'], 400);
+        }
+    }
+
+
+    /**
+     * Poll current game state
+     * @param Request $request
+     * @param $gid
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function poll(Request $request, $gid) {
+        if ($request->header("Token")) {
+            $user = Auth::checkToken($request->header("Token"));
+            if ($user !== Auth::TOKEN_INVALID && $user !== Auth::TOKEN_NOT_EXIST) {
+                $game = Game::find($gid);
+                if (Auth::userMemberOf($request->header("Token"), $game->players)) {
+                    return response()->json(['game' => $game]);
+                } else {
+                    return response()->json(['error' => 'Not authorized to add players'], 401);
                 }
             } else {
                 return response()->json(['error' => 'Not authorized'], 401);

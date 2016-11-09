@@ -45,11 +45,12 @@ $app->group(['prefix' => 'game', 'namespace' => 'App\Http\Controllers'], functio
      * Game related POST
      */
     $app->post('/create', 'GameController@create');
-    $app->post('/{id}/players/add', 'GameController@addPlayer');
-    $app->post('/{id}/start', 'GameController@start');
-    $app->post('/{id}/submit/picture', 'GameController@submitPicture');
+    $app->post('/{gid}/players/add', 'GameController@addPlayer');
+    $app->post('/{gid}/start', 'GameController@start');
+    $app->post('/{gid}/submit/picture', 'GameController@submitPicture');
 
     /*
      * Game related GET
      */
+    $app->get('/{gid}/poll', 'GameController@poll');
 });
