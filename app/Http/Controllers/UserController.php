@@ -60,8 +60,8 @@ class UserController extends Controller
      * @return \Illuminate\Http\JsonResponse
      */
     public function checkToken(Request $request) {
-        if ($request->input('token')) {
-            $user = Auth::checkToken($request->input('token'));
+        if ($request->header('Token')) {
+            $user = Auth::checkToken($request->header('Token'));
             if ($user === Auth::TOKEN_INVALID) {
                 return response()->json(['error' => 'Token not valid!'], 403);
             } else if ($user === Auth::TOKEN_NOT_EXIST) {
@@ -82,21 +82,11 @@ class UserController extends Controller
      * @return \Illuminate\Http\JsonResponse
      */
     public function addFriend(Request $request, $fid) {
-        if ($request->input('token')) {
-            $user = Auth::checkToken($request->input('token'));
-            if ($user === Auth::TOKEN_INVALID) {
-                return response()->json(['error' => 'Token not valid!'], 403);
-            } else if ($user === Auth::TOKEN_NOT_EXIST) {
-                return response()->json(['error' => 'Token does not exist!'], 403);
-            } else if ($user) {
-                $user->friendWith()->attach($fid);
-                $user->save();
-                return response()->json(['friends' => $user->friends()]);
-            } else {
-                return response()->json(['error' => 'Something weird happened...'], 500);
-            }
-        }
-        return response()->json(['error' => 'No token sent'], 400);
+        return Auth::runAsUser($request, function ($req, $user) use ($fid) {
+            $user->friendWith()->attach($fid);
+            $user->save();
+            return response()->json(['friends' => $user->friends()]);
+        });
     }
 
     /**
@@ -128,22 +118,24 @@ class UserController extends Controller
 
     /**
      * List friends for user
-     * @param $token
+     * @param Request $request
      * @return \Illuminate\Http\JsonResponse
      */
-    public function listFriends($token) {
-        if ($token) {
-            $user = Auth::checkToken($token);
-            if ($user === Auth::TOKEN_INVALID) {
-                return response()->json(['error' => 'Token not valid!'], 403);
-            } else if ($user === Auth::TOKEN_NOT_EXIST) {
-                return response()->json(['error' => 'Token does not exist!'], 403);
-            } else if ($user) {
-                return response()->json(['friends' => $user->friends()]);
-            } else {
-                return response()->json(['error' => 'Something weird happened...'], 500);
-            }
-        }
-        return response()->json(['error' => 'No token sent'], 400);
+    public function listFriends(Request $request) {
+        return Auth::runAsUser($request, function ($req, $user) {
+            return $this->listFriendsForId($req, $user->id);
+        });
+    }
+
+    /**
+     *
+     * @param Request $request
+     * @param $id
+     */
+    public function listFriendsForId(Request $request, $id) {
+        Auth::runAsUser($request, function ($req, $user) use ($id) {
+            $other = User::where('id', $id)->first();
+            return response()->json(['dummy' => 'dummy', 'friends' => $other->friends()]);
+        });
     }
 }

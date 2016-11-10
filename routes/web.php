@@ -37,7 +37,8 @@ $app->group(['prefix' => 'user', 'namespace' => 'App\Http\Controllers'], functio
      */
     $app->get('/list', 'UserController@listUsers');
     $app->get('/list/filter/{filter}', 'UserController@listUsersFiltered');
-    $app->get('/{token}/list/friends', 'UserController@listFriends');
+    $app->get('/list/friends', 'UserController@listFriends');
+    $app->get('/{id}/list/friends', 'UserController@listFriendsForId');
 });
 
 $app->group(['prefix' => 'game', 'namespace' => 'App\Http\Controllers'], function () use ($app) {
