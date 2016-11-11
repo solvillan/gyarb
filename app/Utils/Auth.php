@@ -11,6 +11,7 @@ namespace App\Utils;
 
 use App\Models\User;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 
 class Auth
@@ -75,6 +76,28 @@ class Auth
             }
         }
         return $auth;
+    }
+
+    /**
+     * Run closure as user from Token.
+     * Return error if no or invalid Token is sent.
+     * @param Request $request
+     * @param $closure
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public static function runAsUser(Request $request, $closure) {
+        if ($request->header('Token')) {
+            $user = Auth::checkToken($request->header('Token'));
+            if ($user !== Auth::TOKEN_INVALID && $user !== Auth::TOKEN_NOT_EXIST) {
+                return $closure($request, $user);
+            } else if ($user === Auth::TOKEN_INVALID) {
+                return response()->json(['error' => 'Token not valid!'], 403);
+            } else if ($user === Auth::TOKEN_NOT_EXIST) {
+                return response()->json(['error' => 'Token does not exist!'], 403);
+            }
+            return response()->json(['error' => 'Not authorized'], 401);
+        }
+        return response()->json(['error' => 'Malformed request'], 400);
     }
 
 }
