@@ -1,0 +1,71 @@
+/*
+    bg: #333;
+*/
+
+body {
+    background-color: #333333;
+    font-family: Raleway, sans-serif;
+}
+
+.button {
+    display: inline-block;
+    padding: 10px 20px;
+    border-radius: 5px;font-weight: bold;
+    text-decoration: none;
+    background-color: transparent;
+    border: 2px solid #eee;
+    color: #eee;
+}
+
+.go {
+    font-size: 3em;
+}
+
+.center {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.banner {
+    position: absolute;
+    top: 0;
+    right: 0;
+    left: 0;
+    background-color: #eee;
+}
+
+.wrapper {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+}
+
+.wrapper::before {
+    content: "";
+    position: fixed;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    z-index: -1;
+    background-size: cover;
+
+    display: block;
+
+    -webkit-filter: blur(5px);
+    -moz-filter: blur(5px);
+    -o-filter: blur(5px);
+    -ms-filter: blur(5px);
+    filter: blur(5px);
+}
+
+.input {
+    border: 2px solid #eee;
+    background-color: rgba(255, 255, 255, 0.25);
+    border-radius: 5px;
+    padding: 5px;
+}

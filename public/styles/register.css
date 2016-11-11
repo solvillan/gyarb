@@ -1,0 +1,20 @@
+#regForm ul {
+    list-style: none;
+}
+
+#regForm ul li {
+    display: flex;
+}
+
+.label {
+    flex-grow: 1;
+}
+
+.input {
+    flex-grow: 3;
+}
+
+.label {
+    flex-grow: 1;
+}
+
