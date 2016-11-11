@@ -55,6 +55,36 @@ class UserController extends Controller
     }
 
     /**
+     * Auth and init session
+     * (For web login)
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function authSession(Request $request) {
+        if ($request->input('email') && $request->input('password')) {
+            if ($user = User::where(['email' => $request->input('email')])->first()) {
+                if (Hash::check($request->input('password'), $user->password)) {
+                    $token = Auth::generateToken($user->email, $user->token);
+                    session_start();
+                    $_SESSION['token'] = $token;
+                    $_SESSION['name'] = $user->name;
+                    session_commit();
+                    return response()->json(['id' => $user->id,'email' => $user->email, 'token' => $token]);
+                }
+            }
+        }
+        return response()->json(['error' => 'Failed to login'], 403);
+    }
+
+    public function logout() {
+        session_start();
+        $_SESSION['token'] = null;
+        $_SESSION['name'] = null;
+        session_destroy();
+        return redirect("/");
+    }
+
+    /**
      * Check if Token exist
      * @param Request $request
      * @return \Illuminate\Http\JsonResponse

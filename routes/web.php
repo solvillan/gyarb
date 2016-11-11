@@ -23,6 +23,11 @@ $app->get('/register', function () use ($app) {
 $app->get('/download', function () use ($app) {
     return view("download");
 });
+$app->get('/login', function () use ($app) {
+    return view("login");
+});
+$app->post('/login', 'UserController@authSession');
+$app->get('/logout', 'UserController@logout');
 
 $app->group(['prefix' => 'user', 'namespace' => 'App\Http\Controllers'], function () use ($app) {
     /*

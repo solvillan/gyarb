@@ -8,10 +8,16 @@
 
 .label {
     flex-grow: 1;
+    margin: 5px;
+    padding: 5px;
+    font-size: 2em;
 }
 
 .input {
     flex-grow: 3;
+    margin: 5px;
+    padding: 5px;
+    font-size: 2em;
 }
 
 .label {
