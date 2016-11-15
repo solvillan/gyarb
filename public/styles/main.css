@@ -142,6 +142,27 @@ body {
     display: inline-block;
 }
 
+@media screen and (max-width: 2310px) and (min-width: 1756px)  {
+    .osLogo {
+        font-size: 75%;
+    }
+}
+
+@media screen and (max-width: 1756px) {
+    .osLogo {
+        font-size: 25%;
+    }
+}
+
+@media screen and (max-width: 930px) {
+    .osLogo {
+        font-size: 25%;
+    }
+    .osList li {
+        display: block;
+    }
+}
+
 .osLogo {
     width: 15em;
     height: 15em;
