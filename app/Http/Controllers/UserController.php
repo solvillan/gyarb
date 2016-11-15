@@ -73,7 +73,7 @@ class UserController extends Controller
                 }
             }
         }
-        return response()->json(['error' => 'Failed to login'], 403);
+        return response()->json(['error' => 'Failed to login'.($request->input('email') ? '' : ' - No email').($request->input('password') ? '' : ' - No password')], 403);
     }
 
     public function logout() {

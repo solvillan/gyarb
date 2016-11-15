@@ -3,7 +3,13 @@
  */
 
 function register() {
-    var formElem = document.getElementById("regForm");
+    var form = new FormData();
+
+    var inputs = document.querySelector('.input');
+    for (var input in inputs) {
+        form.append(input.name, input.value);
+    }
+
     var request = new XMLHttpRequest();
     request.open("post", "/user/create", true);
     request.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
@@ -21,15 +27,17 @@ function register() {
         }
     };
     console.log(JSON.stringify(form.values()));
-    request.send(formElem);
+    request.send(form);
     console.log("Sent reg request!");
-    location.href = "/download";
+    //location.href = "/download";
     return false; //Disable normal submission
 }
 
 function login() {
-    var formElem = document.getElementById("regForm");
-    var form = new FormData(formElem);
+    var form = new FormData();
+    var params = '';
+    params = params + 'email=' + document.getElementsByName('email')[0].value;
+    params = params + '&password=' + document.getElementsByName('password')[0].value;
 
     var request = new XMLHttpRequest();
     request.open("post", "/login", true);
@@ -48,8 +56,8 @@ function login() {
             }
         }
     };
-    console.log(JSON.stringify(form.values()));
-    request.send(formElem);
+    console.log(JSON.stringify(form));
+    request.send(params);
     console.log("Sent reg request!");
     return false; //Disable normal submission
 }
