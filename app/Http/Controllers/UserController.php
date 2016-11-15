@@ -168,4 +168,5 @@ class UserController extends Controller
             return response()->json(['dummy' => 'dummy', 'friends' => $other->friends()]);
         });
     }
+
 }
