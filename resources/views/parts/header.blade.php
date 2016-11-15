@@ -18,6 +18,12 @@ if (session_status() == PHP_SESSION_NONE) {
 </header>-->
 
 <header class="header">
+    @if(!isset($hideLogo))
+        <a class="logoContainer-s" href="/">
+            <img class="logoImg-s" src="/styles/img/logo.svg">
+            <span class="logoTxt-s">Pixturation</span>
+        </a>
+    @endif
     @if(!isset($_SESSION['token']))
         <a href="/login" class="right">Login</a>
     @else

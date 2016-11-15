@@ -10,11 +10,19 @@ body {
 .button {
     display: inline-block;
     padding: 10px 20px;
-    border-radius: 5px;font-weight: bold;
+    border-radius: 5px;
+    font-weight: bold;
     text-decoration: none;
     background-color: transparent;
     border: 2px solid #eee;
     color: #eee;
+    transition: background-color .2s;
+    width: 100%;
+    text-align: center;
+}
+
+.button:hover {
+    background-color: rgba(238, 238, 238, 0.25);
 }
 
 .go {
@@ -26,6 +34,13 @@ body {
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
+}
+
+.center-h {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
 }
 
 .banner {
@@ -96,6 +111,10 @@ body {
 .header a {
     text-decoration: none;
     color: #eee;
+}
+
+.header a:hover {
+    text-decoration: underline;
 }
 
 .rsep {
@@ -174,4 +193,35 @@ body {
     width: 16em;
     height: 16em;
     padding: 3em;
+}
+
+.logoContainer {
+
+}
+
+.logoImg {
+    height: 4em;
+    width: 4em;
+}
+
+.logoTxt {
+    font-size: 4em;
+    color: #EEEEEE;
+    font-family: Raleway, sans-serif;
+}
+
+.logoContainer-s {
+    display: inline-block;
+    padding: 5px;
+}
+
+.logoImg-s {
+    height: 1em;
+    width: 1em;
+}
+
+.logoTxt-s {
+    font-size: 1em;
+    color: #EEEEEE;
+    font-family: Raleway, sans-serif;
 }
