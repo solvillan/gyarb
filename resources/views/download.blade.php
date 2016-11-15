@@ -1,10 +1,19 @@
 @extends('templates.main')
 
+<?php
+if (session_status() == PHP_SESSION_NONE) {
+    session_start();
+}
+?>
+
 @section('content')
-    <h1>Download now!</h1>
-    <ul>
-        <li><a href="#win">Windows</a></li>
-        <li><a href="#osx">Mac OSX</a></li>
-        <li><a href="#linux">Linux</a></li>
+@if(isset($_SESSION['token']))
+    <ul class="osList center">
+        <li><a href="#win"><img class="osLogo" src="styles/img/winlogo.svg"></a></li>
+        <li><a href="#osx"><img class="osLogo" src="styles/img/osxlogo.svg"></a></li>
+        <li><a href="#linux"><img class="osLogo" src="styles/img/linuxlogo.svg"></a></li>
     </ul>
+@else
+    <h1>Not logged in!</h1>
+@endif
 @endsection

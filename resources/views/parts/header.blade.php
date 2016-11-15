@@ -7,7 +7,9 @@ function isMultiple($count) {
     }
 }
 
-session_start();
+if (session_status() == PHP_SESSION_NONE) {
+    session_start();
+}
 
 ?>
 <!--<header class="banner">
@@ -19,7 +21,7 @@ session_start();
     @if(!isset($_SESSION['token']))
         <a href="/login" class="right">Login</a>
     @else
-        <span class="right rsep">{{$_SESSION['name']}}</span>
-        <a href="/logout" class="right">Logout</a>
+        <span class="right">{{$_SESSION['name']}}</span>
+        <a href="/logout" class="rsep right">Logout</a>
     @endif
 </header>

@@ -53,7 +53,12 @@ body {
     top: 0;
     bottom: 0;
     z-index: -1;
-    background-size: cover;
+    background: linear-gradient(222deg, #720000, #074900, #020049);
+    background-size: 600% 600%;
+
+    -webkit-animation: BgAnimation 54s ease infinite;
+    -moz-animation: BgAnimation 54s ease infinite;
+    animation: BgAnimation 54s ease infinite;
 
     display: block;
 
@@ -73,6 +78,8 @@ body {
 
 .right {
     float: right;
+    display: inline-block;
+    padding: 5px;
 }
 
 .header {
@@ -93,4 +100,57 @@ body {
 
 .rsep {
     border-right: 1px solid #eee;
+}
+
+.bgAnim {
+    background: linear-gradient(222deg, #720000, #074900, #020049);
+    background-size: 600% 600%;
+
+    -webkit-animation: BgAnimation 54s ease infinite;
+    -moz-animation: BgAnimation 54s ease infinite;
+    animation: BgAnimation 54s ease infinite;
+}
+
+@-webkit-keyframes BgAnimation {
+    0%{background-position:90% 0%}
+    50%{background-position:11% 100%}
+    100%{background-position:90% 0%}
+}
+@-moz-keyframes BgAnimation {
+    0%{background-position:90% 0%}
+    50%{background-position:11% 100%}
+    100%{background-position:90% 0%}
+}
+@keyframes BgAnimation {
+    0%{background-position:90% 0%}
+    50%{background-position:11% 100%}
+    100%{background-position:90% 0%}
+}
+
+.bottom {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    color: #eee;
+}
+
+.osList {
+    list-style: none;
+}
+.osList li {
+    display: inline-block;
+}
+
+.osLogo {
+    width: 15em;
+    height: 15em;
+    padding: 4em;
+    transition: height .5s, width .5s, padding .5s;
+}
+
+.osLogo:hover {
+    width: 16em;
+    height: 16em;
+    padding: 3em;
 }
