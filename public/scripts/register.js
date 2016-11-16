@@ -49,6 +49,8 @@ function login() {
                 //location.href = "/download";
                 console.log("Logged in!");
                 location.href = "/download";
+            } else if (request.status == 403) {
+                //TODO: show failed login message
             } else {
                 //location.href = "/register";
                 result = JSON.parse(request.responseText);

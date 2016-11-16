@@ -213,6 +213,7 @@ body {
 .logoContainer-s {
     display: inline-block;
     padding: 5px;
+    text-decoration: none !important;
 }
 
 .logoImg-s {
