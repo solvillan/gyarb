@@ -14,6 +14,8 @@ if (session_status() == PHP_SESSION_NONE) {
         <li><a href="#linux"><img class="osLogo" src="styles/img/linuxlogo.svg"></a></li>
     </ul>
 @else
-    <h1>Not logged in!</h1>
+    <div class="center">
+        <a class="button go" href="/login">Login!</a>
+    </div>
 @endif
 @endsection
