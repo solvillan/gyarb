@@ -116,7 +116,7 @@ class GameController extends Controller
                         $picture = new Picture();
                         $picture->owner()->associate($user);
                         $picture->game()->associate($game);
-                        $picture->data = json_encode($payload->data);
+                        $picture->data = $payload->data;
                         $picture->word = $payload->word;
                         $picture->save();
                         $game->status = GameController::GUESS_PICTURE;
