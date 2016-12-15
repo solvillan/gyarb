@@ -27,13 +27,14 @@ class GameController extends Controller
      * @return \Illuminate\Http\JsonResponse|\Illuminate\Http\Response|\Laravel\Lumen\Http\ResponseFactory
      */
     public function create(Request $request) {
-        return Auth::runAsUser($request, function ($request, $user) {
+        return Auth::runAsUser($request, function ($request, User $user) {
             $game = new Game();
             $game->status = GameController::PREPARING;
             $game->owner()->associate($user);
             $game->currentPlayer()->associate($user);
             $game->save();
-            $game->players()->attach($user);
+            //$game->players()->attach($user);
+            $user->plays()->attach($game);
             $user->save();
             $game->save();
             return response()->json(['user' => $user, 'game' => $game], 201);
@@ -52,8 +53,10 @@ class GameController extends Controller
                 $game = Game::find($gid);
                 if (Auth::userMemberOf($request->input('token'), $game->players)) {
                     $player = User::find($request->input('player_id'));
-                    $game->players()->attach($player);
+                    $player->plays()->attach($game);
+                    //$game->players()->attach($player);
                     $game->save();
+                    $player->save();
                     return response()->json(['game' => $game, 'added' => $player, 'added_by' => $user]);
                 } else {
                     return response()->json(['error' => 'Not authorized to add players'], 401);
