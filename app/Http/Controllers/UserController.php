@@ -161,11 +161,31 @@ class UserController extends Controller
      *
      * @param Request $request
      * @param $id
+     * @return \Illuminate\Http\JsonResponse
      */
     public function listFriendsForId(Request $request, $id) {
-        Auth::runAsUser($request, function ($req, $user) use ($id) {
+        return Auth::runAsUser($request, function ($req, $user) use ($id) {
             $other = User::where('id', $id)->first();
             return response()->json(['dummy' => 'dummy', 'friends' => $other->friends()]);
+        });
+    }
+
+    public function listGames(Request $request) {
+        return Auth::runAsUser($request, function ($req, User $user) {
+            return response()->json($user->plays);
+        });
+    }
+
+    public function infoAsUser(Request $request, $id) {
+        return Auth::runAsUser($request, function ($req, User $user) use ($id){
+            $other = User::where('id', $id)->first();
+            return response()->json($other);
+        });
+    }
+
+    public function info(Request $request) {
+        return Auth::runAsUser($request, function ($req, User $user) {
+            return $this->infoAsUser($req, $user->id);
         });
     }
 

@@ -35,7 +35,7 @@ class User extends Model //implements AuthenticatableContract, AuthorizableContr
      * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
     public function plays() {
-        return $this->hasMany('App\Models\Game');
+        return $this->belongsToMany('App\Models\Game', 'game_user');
     }
 
     /**

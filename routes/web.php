@@ -40,10 +40,13 @@ $app->group(['prefix' => 'user', 'namespace' => 'App\Http\Controllers'], functio
     /*
      * User related GET
      */
+    $app->get('/info', 'UserController@info');
     $app->get('/list', 'UserController@listUsers');
     $app->get('/list/filter/{filter}', 'UserController@listUsersFiltered');
     $app->get('/list/friends', 'UserController@listFriends');
+    $app->get('/list/games', 'UserController@listGames');
     $app->get('/{id}/list/friends', 'UserController@listFriendsForId');
+    $app->get('/{id}/info', 'UserController@infoAsUser');
 });
 
 $app->group(['prefix' => 'game', 'namespace' => 'App\Http\Controllers'], function () use ($app) {
