@@ -110,17 +110,18 @@ class GameController extends Controller
         if ($request->input('payload')) {
             return Auth::runAsUser($request, function ($request, $user) use ($gid) {
                 $game = Game::find($gid);
-                if ($game->currentPlayer->id == $user->id && $game->state === GameController::DRAW_PICTURE) {
+                if ($game->currentPlayer->id == $user->id) {
                     $payload = json_decode($request->input('payload'));
                     if ($payload->data && $payload->word) {
                         $picture = new Picture();
                         $picture->owner()->associate($user);
                         $picture->game()->associate($game);
-                        $picture->data = json_encode($payload->data);
+                        $picture->data = $payload->data;
                         $picture->word = $payload->word;
                         $picture->save();
                         $game->status = GameController::GUESS_PICTURE;
-                        return response()->json(["picture" => $picture, "payload" => $payload], 200);
+                        $game->save();
+                        return response()->json(["picture" => $picture, "payload" => $payload, "game" => $game], 200);
                     } else {
                         return response()->json(['error' => "Payload malformed", 'payload' => $payload], 400);
                     }
