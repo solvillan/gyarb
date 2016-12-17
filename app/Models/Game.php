@@ -31,7 +31,7 @@ class Game extends Model
      * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
      */
     public function players() {
-        return $this->hasMany('App\Models\User');
+        return $this->belongsToMany('App\Models\User');
     }
 
     /**

@@ -21,6 +21,8 @@ class Guess extends Migration
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
             $table->integer('game_id')->unsigned()->index();
             $table->foreign('game_id')->references('id')->on('games')->onDelete('cascade');
+            $table->integer('picture_id')->unsigned()->index();
+            $table->foreign('picture_id')->references('id')->on('pictures')->onDelete('cascade');
             $table->timestamp('time');
             $table->timestamps();
         });

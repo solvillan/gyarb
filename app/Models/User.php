@@ -59,7 +59,7 @@ class User extends Model //implements AuthenticatableContract, AuthorizableContr
      * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
     public function friends() {
-        return $this->hasMany('App\Models\User', 'friend', 'user');
+        return $this->belongsToMany('App\Models\User', 'friend', 'user');
     }
 
     /**
@@ -72,7 +72,7 @@ class User extends Model //implements AuthenticatableContract, AuthorizableContr
 
     public function currentDraws()
     {
-        return $this->hasMany('App\Models\Game', 'current_player', 'id');
+        return $this->belongsToMany('App\Models\Game', 'current_player', 'id');
     }
 
 }

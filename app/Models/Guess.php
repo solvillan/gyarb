@@ -14,7 +14,7 @@ use Illuminate\Database\Eloquent\Model;
 class Guess extends Model
 {
     protected $fillable = [
-        'guess', 'word', 'time', 'user_id', 'game_id',
+        'guess', 'word', 'time', 'user_id', 'game_id', 'picture_id',
     ];
 
 
@@ -29,7 +29,7 @@ class Guess extends Model
     ];
 
     /**
-     * The User that own the Picture
+     * The User that own the Guess
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
     public function owner() {
@@ -37,11 +37,19 @@ class Guess extends Model
     }
 
     /**
-     * The Game that the Picture belong to
+     * The Game that the Guess belong to
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
     public function game() {
         return $this->belongsTo('App\Models\Game');
+    }
+
+    /**
+     * The {@link App\Model\Picture} that the Guess belongs to
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function picture(){
+        return $this->belongsTo('App\Models\Picture');
     }
 
 }
