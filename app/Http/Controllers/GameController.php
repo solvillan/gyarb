@@ -50,9 +50,9 @@ class GameController extends Controller
      */
     public function addPlayer(Request $request, $gid) {
         if ($request->input('player_id')) {
-            return Auth::runAsUser($request, function ($request, $user) use ($gid) {
+            return Auth::runAsUser($request, function (Request $request, $user) use ($gid) {
                 $game = Game::find($gid);
-                if (Auth::userMemberOf($request->input('token'), $game->players)) {
+                if (Auth::userMemberOf($request->header('Token'), $game->players)) {
                     $player = User::find($request->input('player_id'));
                     $player->plays()->attach($game);
                     //$game->players()->attach($player);
@@ -165,7 +165,7 @@ class GameController extends Controller
         return Auth::runAsUser($request, function ($request, $user) use ($gid) {
             $game = Game::find($gid);
             if (Auth::userMemberOf($request->header("Token"), $game->players)) {
-                return response()->json(['game' => $game, 'status' => $]);
+                return response()->json(['game' => $game]);
             } else {
                 return response()->json(['error' => 'Not authorized to add players'], 401);
             }

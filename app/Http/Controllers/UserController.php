@@ -97,7 +97,7 @@ class UserController extends Controller
             } else if ($user === Auth::TOKEN_NOT_EXIST) {
                 return response()->json(['error' => 'Token does not exist!'], 403);
             } else if ($user) {
-                return response()->json(['name' => $user->name, 'email' => $user->email]);
+                return response()->json(['name' => $user->name, 'email' => $user->email, 'id' => $user->id]);
             } else {
                 return response()->json(['error' => 'Something weird happened...'], 500);
             }
