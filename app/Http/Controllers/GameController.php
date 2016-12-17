@@ -10,6 +10,7 @@ namespace App\Http\Controllers;
 
 
 use App\Models\Game;
+use App\Models\Guess;
 use App\Models\Picture;
 use App\Models\User;
 use App\Utils\Auth;
@@ -137,9 +138,19 @@ class GameController extends Controller
         }
     }
 
-    public function submitGuess(Request $request) {
-        return Auth::runAsUser($request, function (Request $request, $user){
-            $data = json_decode($request->input('data'));
+    public function submitGuess(Request $request, $id) {
+        return Auth::runAsUser($request, function (Request $request, User $user) use ($id){
+            $data = json_decode($request->input('payload'));
+            $game = Game::find($id);
+            foreach ($game->plays() as $player) {
+                if ($player->id == $user->id) {
+                    $guess = new Guess();
+                    $guess->owner()->associate($user);
+                    $guess->game()->associate($game);
+                    $guess->guess = $data->guess;
+                    $guess->save();
+                }
+            }
             
         });
     }
@@ -154,7 +165,7 @@ class GameController extends Controller
         return Auth::runAsUser($request, function ($request, $user) use ($gid) {
             $game = Game::find($gid);
             if (Auth::userMemberOf($request->header("Token"), $game->players)) {
-                return response()->json(['game' => $game]);
+                return response()->json(['game' => $game, 'status' => $]);
             } else {
                 return response()->json(['error' => 'Not authorized to add players'], 401);
             }
