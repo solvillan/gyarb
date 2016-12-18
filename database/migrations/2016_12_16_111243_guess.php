@@ -13,7 +13,7 @@ class Guess extends Migration
      */
     public function up()
     {
-        Schema::create('guess', function (Blueprint $table) {
+        Schema::create('guesses', function (Blueprint $table) {
             $table->increments('id');
             $table->string('guess');
             $table->string('word');

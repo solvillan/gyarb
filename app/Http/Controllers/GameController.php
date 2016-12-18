@@ -33,6 +33,7 @@ class GameController extends Controller
             $game->status = GameController::PREPARING;
             $game->owner()->associate($user);
             $game->currentPlayer()->associate($user);
+            $game->currentPicture()->associate(null);
             $game->save();
             //$game->players()->attach($user);
             $user->plays()->attach($game);
@@ -124,6 +125,7 @@ class GameController extends Controller
                         $picture->word = $payload->word;
                         $picture->save();
                         $game->status = GameController::GUESS_PICTURE;
+                        $game->currentPicture()->associate($picture);
                         $game->save();
                         return response()->json(["picture" => $picture, "payload" => $payload, "game" => $game], 200);
                     } else {
@@ -138,18 +140,28 @@ class GameController extends Controller
         }
     }
 
-    public function submitGuess(Request $request, $id) {
-        return Auth::runAsUser($request, function (Request $request, User $user) use ($id){
-            $data = json_decode($request->input('payload'));
-            $game = Game::find($id);
-            foreach ($game->plays() as $player) {
-                if ($player->id == $user->id) {
-                    $guess = new Guess();
-                    $guess->owner()->associate($user);
-                    $guess->game()->associate($game);
-                    $guess->guess = $data->guess;
-                    $guess->save();
+    public function submitGuess(Request $request, $gid) {
+        return Auth::runAsUser($request, function (Request $request, User $user) use ($gid){
+            $payload = json_decode($request->input('payload'));
+            /** @var Game $game */
+            $game = Game::findOrFail($gid);
+            if (Auth::userMemberOf($request->header("Token"), $game->players)) {
+                $hasGuessed = Guess::where(['user_id' => $user->id, 'picture_id' => $game->currentPicture->id])->count();
+                if ($hasGuessed > 0) {
+                    return response()->json(['error' => 'Guess already submitted']);
                 }
+                $guess = new Guess();
+                $guess->owner()->associate($user);
+                $guess->game()->associate($game);
+                $guess->picture()->associate($game->currentPicture);
+                $guess->guess = $payload->guess;
+                $guess->save();
+                $guess_count = Guess::where(['game_id' => $game->id, 'picture_id' => $game->currentPicture->id])->count();
+                $player_count = $game->players()->count();
+                if ($guess_count == $player_count) {
+                    return response()->json(['guessc' => $guess_count, 'playerc' => $player_count, 'shouldbeequal' => true]);
+                }
+                return response()->json(['guessc' => $guess_count, 'playerc' => $player_count]);
             }
             
         });

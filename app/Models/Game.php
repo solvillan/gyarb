@@ -55,4 +55,9 @@ class Game extends Model
         return $this->belongsTo('App\Models\User', 'current_player');
     }
 
+    public function currentPicture()
+    {
+        return $this->belongsTo('App\Models\Picture', 'current_picture_id');
+    }
+
 }
