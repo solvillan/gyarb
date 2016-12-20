@@ -160,14 +160,21 @@ class GameController extends Controller
                 $guess->owner()->associate($user);
                 $guess->game()->associate($game);
                 $guess->picture()->associate($game->currentPicture);
-                $guess->guess = $payload->guess;
+                $guess->guess = strtolower($payload->guess);
                 $guess->save();
                 $guess_count = Guess::where(['game_id' => $game->id, 'picture_id' => $game->currentPicture->id])->count();
                 $player_count = $game->players()->count();
+                $correct = $guess->guess == $game->current_word;
                 if ($guess_count == $player_count) {
-                    return response()->json(['guessc' => $guess_count, 'playerc' => $player_count, 'shouldbeequal' => true]);
+                    $game->status = GameController::DRAW_PICTURE;
+                    $game->current_word = Wordlist::getWord();
+                    $new_player = $game->players()->get()->shuffle()->first();
+                    $game->currentPlayer()->associate($new_player);
+                    $game->save();
                 }
-                return response()->json(['guessc' => $guess_count, 'playerc' => $player_count]);
+                return response()->json(['correct' => $correct]);
+            } else {
+                return response()->json(['error' => 'Player not part of game'], 403);
             }
             
         });
