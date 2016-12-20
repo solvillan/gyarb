@@ -177,6 +177,7 @@ class GameController extends Controller
         return Auth::runAsUser($request, function ($request, $user) use ($gid) {
             $game = Game::find($gid);
             if (Auth::userMemberOf($request->header("Token"), $game->players)) {
+                $game->currentPicture;
                 return response()->json(['game' => $game]);
             } else {
                 return response()->json(['error' => 'Not authorized to add players'], 401);
