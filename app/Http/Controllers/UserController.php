@@ -96,6 +96,8 @@ class UserController extends Controller
                 return response()->json(['error' => 'Token not valid!'], 403);
             } else if ($user === Auth::TOKEN_NOT_EXIST) {
                 return response()->json(['error' => 'Token does not exist!'], 403);
+            } else if ($user === Auth::TOKEN_EXPIRED) {
+                return response()->json(['error' => 'Token expired'], 498);
             } else if ($user) {
                 return response()->json(['name' => $user->name, 'email' => $user->email, 'id' => $user->id]);
             } else {
@@ -170,12 +172,23 @@ class UserController extends Controller
         });
     }
 
+    /**
+     * List all games a user play
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function listGames(Request $request) {
         return Auth::runAsUser($request, function ($req, User $user) {
             return response()->json($user->plays);
         });
     }
 
+    /**
+     * Get player info from id
+     * @param Request $request
+     * @param $id
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function infoAsUser(Request $request, $id) {
         return Auth::runAsUser($request, function ($req, User $user) use ($id){
             $other = User::where('id', $id)->first();
@@ -183,10 +196,19 @@ class UserController extends Controller
         });
     }
 
+    /**
+     * Get info for current player
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function info(Request $request) {
         return Auth::runAsUser($request, function ($req, User $user) {
             return $this->infoAsUser($req, $user->id);
         });
+    }
+
+    public function refreshToken(Request $request){
+        //TODO Return new token based on the old, unless token is too old
     }
 
 }

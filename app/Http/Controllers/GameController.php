@@ -106,7 +106,7 @@ class GameController extends Controller
     }
 
     /**
-     * Submit a picture to game
+     * Submit a picture to game where post contain a JSON payload with data-property containing Base64encoded GZipped Json formatted picture data (phew...)
      * @param Request $request
      * @param $gid
      * @return \Illuminate\Http\JsonResponse
@@ -140,6 +140,12 @@ class GameController extends Controller
         }
     }
 
+    /**
+     * Submit a guess via JSON formatted payload
+     * @param Request $request
+     * @param $gid
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function submitGuess(Request $request, $gid) {
         return Auth::runAsUser($request, function (Request $request, User $user) use ($gid){
             $payload = json_decode($request->input('payload'));

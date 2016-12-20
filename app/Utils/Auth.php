@@ -17,7 +17,7 @@ use Illuminate\Support\Facades\Hash;
 class Auth
 {
 
-    const TOKEN_VALID = 1, TOKEN_NOT_EXIST = 2, TOKEN_INVALID = 3;
+    const TOKEN_VALID = 1, TOKEN_NOT_EXIST = 2, TOKEN_INVALID = 3, TOKEN_EXPIRED = 4;
 
     /**
      * Generate a key
@@ -51,6 +51,9 @@ class Auth
         $payload = json_decode(base64_decode($token));
         if (is_object($payload)) {
             if ($user = User::where('token', $payload->key)->first()) {
+                if (date_create()->getTimestamp() - $payload->timestamp > 172800) { //If token is older than 48 hours
+                    return Auth::TOKEN_EXPIRED;
+                }
                 return $user;
             } else {
                 return Auth::TOKEN_NOT_EXIST;
@@ -94,6 +97,8 @@ class Auth
                 return response()->json(['error' => 'Token not valid!'], 403);
             } else if ($user === Auth::TOKEN_NOT_EXIST) {
                 return response()->json(['error' => 'Token does not exist!'], 403);
+            } else if ($user === Auth::TOKEN_EXPIRED) {
+                return response()->json(['error' => 'Token expired!'], 498);
             }
             return response()->json(['error' => 'Not authorized'], 401);
         }

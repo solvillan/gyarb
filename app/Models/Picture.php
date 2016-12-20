@@ -44,11 +44,19 @@ class Picture extends Model
         return $this->belongsTo('App\Models\Game');
     }
 
+    /**
+     * The game that this picture is the current one (if there is one)
+     * @return \Illuminate\Database\Eloquent\Relations\HasOne
+     */
     public function isCurrentPictureAt()
     {
         return$this->hasOne('App\Models\Picture', 'current_picture_id');
     }
 
+    /**
+     * The guesses for the picture
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
     public function guesses()
     {
         return $this->hasMany('App\Model\Guess');

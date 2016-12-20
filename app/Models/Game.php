@@ -50,11 +50,19 @@ class Game extends Model
         return $this->belongsTo('App\Models\User');
     }
 
+    /**
+     * The current player
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
     public function currentPlayer()
     {
         return $this->belongsTo('App\Models\User', 'current_player');
     }
 
+    /**
+     * The current picture (if there is one)
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
     public function currentPicture()
     {
         return $this->belongsTo('App\Models\Picture', 'current_picture_id');

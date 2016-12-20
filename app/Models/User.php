@@ -70,6 +70,10 @@ class User extends Model //implements AuthenticatableContract, AuthorizableContr
         return $this->belongsToMany('App\Models\User', 'user', 'friend');
     }
 
+    /**
+     * The games where the player is the current painter
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
+     */
     public function currentDraws()
     {
         return $this->belongsToMany('App\Models\Game', 'current_player', 'id');
