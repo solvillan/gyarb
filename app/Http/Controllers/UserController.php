@@ -46,6 +46,8 @@ class UserController extends Controller
         if ($request->input('email') && $request->input('password')) {
             if ($user = User::where(['email' => $request->input('email')])->first()) {
                 if (Hash::check($request->input('password'), $user->password)) {
+                    $user->token = Auth::generateKey($user->email, $user->password);
+                    $user->save();
                     $token = Auth::generateToken($user->email, $user->token);
                     return response()->json(['id' => $user->id,'email' => $user->email, 'token' => $token]);
                 }
@@ -64,6 +66,7 @@ class UserController extends Controller
         if ($request->input('email') && $request->input('password')) {
             if ($user = User::where(['email' => $request->input('email')])->first()) {
                 if (Hash::check($request->input('password'), $user->password)) {
+                    $user->token = Auth::generateKey($user->email, $user->password);
                     $token = Auth::generateToken($user->email, $user->token);
                     session_start();
                     $_SESSION['token'] = $token;
@@ -209,6 +212,11 @@ class UserController extends Controller
 
     public function refreshToken(Request $request){
         //TODO Return new token based on the old, unless token is too old
+        Auth::runAsUser($request, function ($req, User $user) {
+            $user->token = Auth::generateKey($user->email, $user->password);
+            $user->save();
+            return response()->json(['token' => Auth::generateToken($user->email, $user->token)]);
+        });
     }
 
 }

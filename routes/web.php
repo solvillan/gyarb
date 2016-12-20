@@ -35,7 +35,8 @@ $app->group(['prefix' => 'user', 'namespace' => 'App\Http\Controllers'], functio
      */
     $app->post('/create', 'UserController@create');
     $app->post('/auth', 'UserController@auth');
-    $app->post('/check-token', 'UserController@checkToken');
+    $app->post('/token/check', 'UserController@checkToken');
+    $app->post('/token/refresh', 'UserController@refreshToken');
 
     /*
      * User related GET
