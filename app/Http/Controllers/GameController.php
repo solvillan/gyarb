@@ -129,6 +129,7 @@ class GameController extends Controller
                         $picture->game()->associate($game);
                         $picture->data = $payload->data;
                         $picture->word = $payload->word;
+                        $picture->time = date_create()->getTimestamp();
                         $picture->save();
                         $game->status = GameController::GUESS_PICTURE;
                         $game->currentPicture()->associate($picture);
@@ -167,6 +168,7 @@ class GameController extends Controller
                 $guess->game()->associate($game);
                 $guess->picture()->associate($game->currentPicture);
                 $guess->guess = strtolower($payload->guess);
+                $guess->time = date_create()->getTimestamp();
                 $guess->save();
                 $guess_count = Guess::where(['game_id' => $game->id, 'picture_id' => $game->currentPicture->id])->count();
                 $player_count = $game->players()->count();
@@ -211,11 +213,18 @@ class GameController extends Controller
             $game = Game::find($gid);
             if (Auth::userMemberOf($request->header("Token"), $game->players)) {
                 $game->currentPicture;
-                return response()->json(['game' => $game]);
+                return response()->json(['game' => $game, 'has_move' => $this->userHasMove($user, $game)]);
             } else {
                 return response()->json(['error' => 'Not authorized to add players'], 401);
             }
         });
+    }
+
+    private function userHasMove(User $user, Game $game) {
+        /*if ($game->status = GameController::DRAW_PICTURE && $game->currentPlayer == $user) return true;
+        if ($game->status = GameController::GUESS_PICTURE && $game->currentPlayer != $user) return true;
+        return false;*/
+        return ($game->status == GameController::DRAW_PICTURE && $game->currentPlayer == $user) || ($game->status == GameController::GUESS_PICTURE && $game->currentPlayer != $user);
     }
 
 }
