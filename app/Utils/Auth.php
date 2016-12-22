@@ -51,7 +51,7 @@ class Auth
         $payload = json_decode(base64_decode($token));
         if (is_object($payload)) {
             if ($user = User::where('token', $payload->key)->first()) {
-                if (date_create()->getTimestamp() - $payload->timestamp > 172800) { //If token is older than 48 hours
+                if (date_create()->getTimestamp() - $payload->timestamp > 172800000) { //If token is older than 48 hours
                     return Auth::TOKEN_EXPIRED;
                 }
                 return $user;
