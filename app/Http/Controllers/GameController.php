@@ -168,17 +168,13 @@ class GameController extends Controller
                 $guess->game()->associate($game);
                 $guess->picture()->associate($game->currentPicture);
                 $guess->guess = strtolower($payload->guess);
-                $guess->time = date_create()->getTimestamp();
+                $guess->time = $payload->time;
                 $guess->save();
                 $guess_count = Guess::where(['game_id' => $game->id, 'picture_id' => $game->currentPicture->id])->count();
                 $player_count = $game->players()->count();
                 $correct = $guess->guess == $game->current_word;
-                if ($guess_count == $player_count) {
-                    $game->status = GameController::DRAW_PICTURE;
-                    $game->current_word = Wordlist::getWord();
-                    $new_player = $game->players()->get()->shuffle()->first();
-                    $game->currentPlayer()->associate($new_player);
-                    $game->save();
+                if ($guess_count == $player_count - 1) {
+                    $this->resetGame($game);
                 }
                 if ($correct) {
                     $score = $this->calcScore($user, $guess, $game);
@@ -194,12 +190,35 @@ class GameController extends Controller
         });
     }
 
+    /**
+     * Calculates the score for a player
+     *
+     * Equation
+     * y = x^(-(x/600))*500
+     *
+     * @param User $user
+     * @param Guess $guess
+     * @param Game $game
+     * @return array
+     */
     private function calcScore(User $user, Guess $guess, Game $game) {
         $game_pivot = $user->plays()->where('game_id', $game->id)->first()->pivot;
-        $score = floor((-0.0000028935185185185184 * ($guess->time - $game->currentPicture->time) + 500) + 0.5);
+        $score = floor((pow($guess->time, - ($guess->time / 600)) * 500) + 0.5);
         $game_pivot->score += $score;
         $game_pivot->save();
         return ['guess_score' => $score, 'total_score' => $game_pivot->score];
+    }
+
+    /**
+     * Reset game to drawing state with new player and new word
+     * @param Game $game
+     */
+    private function resetGame(Game $game) {
+        $game->status = GameController::DRAW_PICTURE;
+        $game->current_word = Wordlist::getWord();
+        $new_player = $game->players()->get()->shuffle()->first();
+        $game->currentPlayer()->associate($new_player);
+        $game->save();
     }
 
     /**
@@ -212,6 +231,9 @@ class GameController extends Controller
         return Auth::runAsUser($request, function ($request, $user) use ($gid) {
             $game = Game::find($gid);
             if (Auth::userMemberOf($request->header("Token"), $game->players)) {
+                if (date_create()->getTimestamp() - $game->currentPicture->time > 86400000) {
+                    $this->resetGame($game);
+                }
                 $game->currentPicture;
                 return response()->json(['game' => $game, 'has_move' => $this->userHasMove($user, $game)]);
             } else {
@@ -220,6 +242,12 @@ class GameController extends Controller
         });
     }
 
+    /**
+     * Check if user can make a move in the current game state
+     * @param User $user
+     * @param Game $game
+     * @return bool
+     */
     private function userHasMove(User $user, Game $game) {
         /*if ($game->status = GameController::DRAW_PICTURE && $game->currentPlayer == $user) return true;
         if ($game->status = GameController::GUESS_PICTURE && $game->currentPlayer != $user) return true;
