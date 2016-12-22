@@ -32,10 +32,10 @@ class User extends Model //implements AuthenticatableContract, AuthorizableContr
 
     /**
      * The games a User is playing
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
      */
     public function plays() {
-        return $this->belongsToMany('App\Models\Game', 'game_user');
+        return $this->belongsToMany('App\Models\Game', 'game_user')->withPivot('score', 'state');
     }
 
     /**

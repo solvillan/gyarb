@@ -39,6 +39,9 @@ class GameController extends Controller
             $user->plays()->attach($game);
             $user->save();
             $game->save();
+            $game_pivot = $user->plays()->where('game_id', $game->id)->first();
+            $game_pivot->pivot->score = 0;
+            $game_pivot->pivot->save();
             return response()->json(['user' => $user, 'game' => $game], 201);
         });
     }
@@ -59,6 +62,9 @@ class GameController extends Controller
                     //$game->players()->attach($player);
                     $game->save();
                     $player->save();
+                    $game_pivot = $player->plays()->where('game_id', $game->id)->first();
+                    $game_pivot->pivot->score = 0;
+                    $game_pivot->pivot->save();
                     return response()->json(['game' => $game, 'added' => $player, 'added_by' => $user]);
                 } else {
                     return response()->json(['error' => 'Not authorized to add players'], 401);
@@ -172,12 +178,26 @@ class GameController extends Controller
                     $game->currentPlayer()->associate($new_player);
                     $game->save();
                 }
-                return response()->json(['correct' => $correct]);
+                if ($correct) {
+                    $score = $this->calcScore($user, $guess, $game);
+                } else {
+                    $game_pivot = $user->plays()->where('game_id', $game->id)->first()->pivot;
+                    $score = ['guess_score' => 0, 'total_score' => $game_pivot->score];
+                }
+                return response()->json(['correct' => $correct, 'guess_score' => $score['guess_score'], 'total_score' => $score['total_score']]);
             } else {
                 return response()->json(['error' => 'Player not part of game'], 403);
             }
             
         });
+    }
+
+    private function calcScore(User $user, Guess $guess, Game $game) {
+        $game_pivot = $user->plays()->where('game_id', $game->id)->first()->pivot;
+        $score = floor((-0.0000028935185185185184 * ($guess->time - $game->currentPicture->time) + 500) + 0.5);
+        $game_pivot->score += $score;
+        $game_pivot->save();
+        return ['guess_score' => $score, 'total_score' => $game_pivot->score];
     }
 
     /**
