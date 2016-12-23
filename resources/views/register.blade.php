@@ -12,16 +12,13 @@
     <form id="regForm" class="center" method="post" onsubmit="return register();">
         <ul>
             <li>
-                <label class="label" for="name">Username</label>
-                <input class="input" type="text" name="name" required id="name">
+                <input placeholder="Username" class="input" type="text" name="name" required id="name">
             </li>
             <li>
-                <label class="label" for="email">Email</label>
-                <input class="input" type="email" name="email" required id="email">
+                <input placeholder="Email" class="input" type="email" name="email" required id="email">
             </li>
             <li>
-                <label class="label" for="password">Password</label>
-                <input class="input" type="password" name="password" required id="password" >
+                <input placeholder="Password" class="input" type="password" name="password" required id="password" >
             </li>
             <li>
                 <input class="submit button" type="submit" value="Register!">
