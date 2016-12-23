@@ -20,7 +20,7 @@ use Illuminate\Http\Request;
 class GameController extends Controller
 {
 
-    const PREPARING = 0, DRAW_PICTURE = 1, GUESS_PICTURE = 2;
+    const PREPARING = 0, DRAW_PICTURE = 1, GUESS_PICTURE = 2, FINISHED = 3;
 
     /**
      * Create a new Game
@@ -214,11 +214,15 @@ class GameController extends Controller
      * @param Game $game
      */
     private function resetGame(Game $game) {
-        $game->status = GameController::DRAW_PICTURE;
-        $game->current_word = Wordlist::getWord();
-        $new_player = $game->players()->get()->shuffle()->first();
-        $game->currentPlayer()->associate($new_player);
-        $game->save();
+        if ($game->pictures()->count() < $game->players()->count()*2) {
+            $game->status = GameController::DRAW_PICTURE;
+            $game->current_word = Wordlist::getWord();
+            $new_player = $game->players()->get()->shuffle()->first();
+            $game->currentPlayer()->associate($new_player);
+            $game->save();
+        } else {
+            $game->status = GameController::FINISHED;
+        }
     }
 
     /**
@@ -229,10 +233,12 @@ class GameController extends Controller
      */
     public function poll(Request $request, $gid) {
         return Auth::runAsUser($request, function ($request, $user) use ($gid) {
-            $game = Game::find($gid);
+            $game = Game::findOrFail($gid);
             if (Auth::userMemberOf($request->header("Token"), $game->players)) {
-                if (date_create()->getTimestamp() - $game->currentPicture->time > 86400000) {
-                    $this->resetGame($game);
+                if ($game->currentPicture != null) {
+                    if (date_create()->getTimestamp() - $game->currentPicture->time > 86400000) {
+                        $this->resetGame($game);
+                    }
                 }
                 $game->currentPicture;
                 return response()->json(['game' => $game, 'has_move' => $this->userHasMove($user, $game)]);
