@@ -23,6 +23,7 @@ $app->get('/register', function () use ($app) {
 $app->get('/download', function () use ($app) {
     return view("download");
 });
+$app->get('/download/jar', 'FileController@getJar');
 $app->get('/login', function () use ($app) {
     return view("login");
 });
