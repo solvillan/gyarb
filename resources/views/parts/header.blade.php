@@ -27,7 +27,7 @@ if (session_status() == PHP_SESSION_NONE) {
     @if(!isset($_SESSION['token']))
         <a href="/login" class="right">Login</a>
     @else
-        <span class="right">{{$_SESSION['name']}}</span>
+        <span class="right">{{htmlentities($_SESSION['name'])}}</span>
         <a href="/logout" class="rsep right">Logout</a>
     @endif
 </header>
